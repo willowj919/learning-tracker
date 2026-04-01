@@ -1,0 +1,788 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>学习规划追踪器</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Mono:wght@400;500&family=Syne:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #F7F5F0;
+    --surface: #FFFFFF;
+    --border: #E2DDD6;
+    --text: #1A1814;
+    --muted: #8A8580;
+    --seo: #0F6E56;
+    --seo-bg: #E1F5EE;
+    --seo-mid: #1D9E75;
+    --perf: #3C3489;
+    --perf-bg: #EEEDFE;
+    --perf-mid: #7F77DD;
+    --cro: #633806;
+    --cro-bg: #FAEEDA;
+    --cro-mid: #BA7517;
+    --accent: #1A1814;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Syne', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    padding: 2rem 1rem 4rem;
+  }
+
+  .container { max-width: 780px; margin: 0 auto; }
+
+  header {
+    margin-bottom: 3rem;
+    padding-bottom: 2rem;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .header-top {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 1rem;
+    flex-wrap: wrap;
+  }
+
+  h1 {
+    font-family: 'DM Serif Display', serif;
+    font-size: clamp(2rem, 5vw, 3rem);
+    line-height: 1.1;
+    letter-spacing: -0.02em;
+  }
+
+  h1 em {
+    font-style: italic;
+    color: var(--muted);
+  }
+
+  .progress-summary {
+    display: flex;
+    gap: 1.5rem;
+    margin-top: 1.5rem;
+    flex-wrap: wrap;
+  }
+
+  .progress-stat {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  .progress-stat .num {
+    font-family: 'DM Mono', monospace;
+    font-size: 1.75rem;
+    font-weight: 500;
+    line-height: 1;
+  }
+
+  .progress-stat .label {
+    font-size: 0.7rem;
+    color: var(--muted);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  .progress-bar-wrap {
+    margin-top: 1.25rem;
+    height: 3px;
+    background: var(--border);
+    border-radius: 2px;
+    overflow: hidden;
+  }
+
+  .progress-bar-fill {
+    height: 100%;
+    background: var(--accent);
+    border-radius: 2px;
+    transition: width 0.4s ease;
+  }
+
+  .phase-section { margin-bottom: 2.5rem; }
+
+  .phase-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 1rem;
+    padding: 0.75rem 1rem;
+    border-radius: 8px;
+    position: sticky;
+    top: 0.5rem;
+    z-index: 10;
+    backdrop-filter: blur(8px);
+  }
+
+  .phase-header.seo { background: var(--seo-bg); }
+  .phase-header.perf { background: var(--perf-bg); }
+  .phase-header.cro { background: var(--cro-bg); }
+
+  .phase-dot {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+
+  .phase-header.seo .phase-dot { background: var(--seo-mid); }
+  .phase-header.perf .phase-dot { background: var(--perf-mid); }
+  .phase-header.cro .phase-dot { background: var(--cro-mid); }
+
+  .phase-label {
+    font-size: 0.7rem;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+
+  .phase-header.seo .phase-label { color: var(--seo); }
+  .phase-header.perf .phase-label { color: var(--perf); }
+  .phase-header.cro .phase-label { color: var(--cro); }
+
+  .phase-progress {
+    margin-left: auto;
+    font-family: 'DM Mono', monospace;
+    font-size: 0.7rem;
+    color: var(--muted);
+  }
+
+  .week-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    margin-bottom: 10px;
+    overflow: hidden;
+    transition: border-color 0.2s;
+  }
+
+  .week-card:hover { border-color: #C8C4BC; }
+
+  .week-card.completed { opacity: 0.6; }
+
+  .week-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 0.875rem 1rem;
+    cursor: pointer;
+    user-select: none;
+  }
+
+  .week-num {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.7rem;
+    color: var(--muted);
+    min-width: 40px;
+    flex-shrink: 0;
+  }
+
+  .week-title {
+    flex: 1;
+    font-size: 0.9rem;
+    font-weight: 500;
+  }
+
+  .week-badge {
+    font-size: 0.65rem;
+    padding: 2px 8px;
+    border-radius: 20px;
+    flex-shrink: 0;
+  }
+
+  .seo .week-badge { background: var(--seo-bg); color: var(--seo); }
+  .perf .week-badge { background: var(--perf-bg); color: var(--perf); }
+  .cro .week-badge { background: var(--cro-bg); color: var(--cro); }
+
+  .expand-icon {
+    font-size: 0.7rem;
+    color: var(--muted);
+    transition: transform 0.2s;
+    flex-shrink: 0;
+  }
+
+  .week-card.open .expand-icon { transform: rotate(180deg); }
+
+  .week-body {
+    display: none;
+    padding: 0 1rem 1rem;
+    border-top: 1px solid var(--border);
+  }
+
+  .week-card.open .week-body { display: block; }
+
+  .task-list { margin-top: 0.875rem; display: flex; flex-direction: column; gap: 6px; }
+
+  .task-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 8px 10px;
+    border-radius: 6px;
+    background: var(--bg);
+    transition: background 0.15s;
+    cursor: pointer;
+  }
+
+  .task-item:hover { background: #EEEAE2; }
+
+  .task-item.done { opacity: 0.5; }
+
+  .task-item.done .task-text { text-decoration: line-through; }
+
+  .task-cb {
+    width: 16px; height: 16px;
+    border: 1.5px solid var(--border);
+    border-radius: 4px;
+    flex-shrink: 0;
+    margin-top: 1px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.15s;
+    background: white;
+  }
+
+  .task-item.done .task-cb {
+    background: var(--accent);
+    border-color: var(--accent);
+  }
+
+  .task-cb svg { display: none; }
+  .task-item.done .task-cb svg { display: block; }
+
+  .task-text { font-size: 0.82rem; line-height: 1.5; color: var(--text); flex: 1; }
+
+  .task-meta { font-size: 0.72rem; color: var(--muted); margin-top: 2px; }
+
+  .section-label {
+    font-size: 0.65rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin: 1rem 0 0.4rem;
+  }
+
+  .add-task-row {
+    display: flex;
+    gap: 8px;
+    margin-top: 0.75rem;
+  }
+
+  .add-task-input {
+    flex: 1;
+    font-family: 'Syne', sans-serif;
+    font-size: 0.82rem;
+    padding: 7px 10px;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    background: var(--bg);
+    color: var(--text);
+    outline: none;
+    transition: border-color 0.15s;
+  }
+
+  .add-task-input:focus { border-color: var(--accent); }
+  .add-task-input::placeholder { color: var(--muted); }
+
+  .add-task-btn {
+    font-family: 'Syne', sans-serif;
+    font-size: 0.75rem;
+    padding: 7px 14px;
+    background: var(--accent);
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: opacity 0.15s;
+    white-space: nowrap;
+  }
+
+  .add-task-btn:hover { opacity: 0.8; }
+
+  .delete-task {
+    font-size: 0.7rem;
+    color: var(--muted);
+    cursor: pointer;
+    padding: 2px 4px;
+    border-radius: 3px;
+    flex-shrink: 0;
+    opacity: 0;
+    transition: opacity 0.15s;
+    background: none;
+    border: none;
+  }
+
+  .task-item:hover .delete-task { opacity: 1; }
+  .delete-task:hover { color: #cc4444; }
+
+  .reset-btn {
+    font-family: 'Syne', sans-serif;
+    font-size: 0.72rem;
+    padding: 6px 12px;
+    background: none;
+    color: var(--muted);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+
+  .reset-btn:hover { border-color: #cc4444; color: #cc4444; }
+
+  .core-q-card {
+    background: var(--accent);
+    color: white;
+    border-radius: 10px;
+    padding: 1.25rem 1.5rem;
+    margin-bottom: 2rem;
+  }
+
+  .core-q-card p { font-size: 0.78rem; opacity: 0.7; margin-bottom: 6px; }
+  .core-q-card h2 { font-family: 'DM Serif Display', serif; font-size: 1.25rem; line-height: 1.4; font-weight: 400; }
+
+  @media (max-width: 500px) {
+    .week-body { padding: 0 0.75rem 0.75rem; }
+    .progress-summary { gap: 1rem; }
+  }
+</style>
+</head>
+<body>
+<div class="container">
+
+<header>
+  <div class="header-top">
+    <h1>学习<br><em>规划追踪</em></h1>
+    <button class="reset-btn" onclick="resetAll()">重置进度</button>
+  </div>
+  <div class="progress-summary">
+    <div class="progress-stat">
+      <span class="num" id="stat-done">0</span>
+      <span class="label">已完成任务</span>
+    </div>
+    <div class="progress-stat">
+      <span class="num" id="stat-total">0</span>
+      <span class="label">总任务数</span>
+    </div>
+    <div class="progress-stat">
+      <span class="num" id="stat-weeks">0</span>
+      <span class="label">已完成周数</span>
+    </div>
+  </div>
+  <div class="progress-bar-wrap">
+    <div class="progress-bar-fill" id="progress-bar" style="width:0%"></div>
+  </div>
+</header>
+
+<div class="core-q-card">
+  <p>每次碰到任何 Marketing 问题，先问自己：</p>
+  <h2>"这件事影响的是流量、留存、还是转化？"</h2>
+</div>
+
+<div id="phases"></div>
+
+</div>
+
+<script>
+const DATA = {
+  phases: [
+    {
+      id: 'seo',
+      label: 'SEO — 先建地图，再填细节',
+      weeks: [
+        {
+          week: '第1周',
+          title: '搜索意图是什么',
+          badge: '地图',
+          tasks: [
+            { text: '看 Aleyda Solis "search intent" YouTube 系列视频', meta: '资源：YouTube' },
+            { text: '把两个客户网站的核心页面逐一检查：用户搜这个词想要什么？', meta: '实践' },
+            { text: '找出至少3个意图不匹配的页面，记录下来', meta: '实践' },
+          ]
+        },
+        {
+          week: '第2周',
+          title: 'GSC数据怎么读',
+          badge: '地图',
+          tasks: [
+            { text: '读 Google Search Console 官方文档的 Performance 报告部分', meta: '资源：GSC官方文档' },
+            { text: '订阅 Search Engine Roundtable，保持行业动态感知', meta: '资源：免费' },
+            { text: '找出 impressions > 100 但 CTR < 3% 的所有页面', meta: '实践' },
+            { text: '针对其中一个页面，写出改进 title/meta 的具体假设', meta: '实践' },
+          ]
+        },
+        {
+          week: '第3周',
+          title: 'Tech SEO 的优先级框架',
+          tasks: [
+            { text: '用 Screaming Frog 免费版爬客户网站', meta: '工具：Screaming Frog' },
+            { text: '只关注4类问题：crawl errors、重复内容、缺失 meta、慢速页面', meta: '实践' },
+            { text: '列出按优先级排序的修复清单', meta: '实践' },
+          ]
+        },
+        {
+          week: '第4周',
+          title: 'Local SEO 的核心逻辑',
+          tasks: [
+            { text: '读 Whitespark Local SEO Ranking Factors 报告', meta: '资源：whitespark.ca 免费' },
+            { text: '检查两个客户 GBP 完整度：类别、描述、照片、reviews回复、Q&A', meta: '实践' },
+            { text: '找出两个客户 GBP 最大的优化缺口', meta: '实践' },
+          ]
+        },
+        {
+          week: '第5周',
+          title: '关键词研究的底层逻辑',
+          tasks: [
+            { text: '看 Ahrefs Academy 关键词研究模块（免费）', meta: '资源：ahrefs.com/academy' },
+            { text: '用免费版 Ahrefs 或 Semrush 找竞争对手排名但你没有的关键词', meta: '实践' },
+            { text: '建立一个"可以赢的关键词"优先级清单', meta: '实践' },
+          ]
+        },
+        {
+          week: '第6周',
+          title: 'Core Web Vitals 实操',
+          tasks: [
+            { text: '用 PageSpeed Insights 跑两个客户网站', meta: '工具：免费' },
+            { text: '找出 LCP 和 CLS 的具体问题', meta: '实践' },
+            { text: '读 web.dev 对应修复文档，执行至少一个修复', meta: '资源：web.dev 官方' },
+          ]
+        },
+      ]
+    },
+    {
+      id: 'perf',
+      label: 'Performance Marketing — 从执行升到分析',
+      weeks: [
+        {
+          week: '第7周',
+          title: '广告漏斗的完整逻辑',
+          badge: '地图',
+          tasks: [
+            { text: '开始 Meta Blueprint 完整 Marketing 认证路径', meta: '资源：Meta Blueprint 免费' },
+            { text: '在 agency 实际账户里，把一个 campaign 漏斗从头到尾读一遍', meta: '实践' },
+            { text: '找出最大的流失环节，写下你的分析', meta: '实践' },
+          ]
+        },
+        {
+          week: '第8周',
+          title: '归因模型是什么',
+          badge: '地图',
+          tasks: [
+            { text: '完成 Meta Blueprint 归因模块', meta: '资源：Meta Blueprint' },
+            { text: '看 Loves Data YouTube 归因模型讲解视频', meta: '资源：YouTube 免费' },
+            { text: '在 Ads Manager 切换归因窗口，观察同一 campaign 数据变化', meta: '实践' },
+          ]
+        },
+        {
+          week: '第9周',
+          title: '受众策略的底层逻辑',
+          tasks: [
+            { text: '完成 Meta Blueprint 受众模块', meta: '资源：Meta Blueprint' },
+            { text: '比较 agency 账户里不同受众组的 CPM、CTR 和转化率', meta: '实践' },
+            { text: '总结表现最好的受众特征规律', meta: '实践' },
+          ]
+        },
+        {
+          week: '第10周',
+          title: '如何判断广告是否值得继续投',
+          tasks: [
+            { text: '看 Loves Data · ROAS 分析系列视频', meta: '资源：YouTube 免费' },
+            { text: '找出 agency 里一个表现差的 campaign，用 ROAS/CPA 框架分析', meta: '实践' },
+            { text: '写出应该停投还是继续优化的判断和理由', meta: '实践' },
+          ]
+        },
+        {
+          week: '第11周',
+          title: '广告创意和落地页的匹配',
+          tasks: [
+            { text: '开始 Google Skillshop · Google Ads 认证', meta: '资源：Skillshop 免费' },
+            { text: '找一个 CTR 高但转化低的广告，分析广告承诺和落地页内容的断层', meta: '实践' },
+            { text: '读 CXL Institute landing page 优化博客对应文章', meta: '资源：cxl.com 免费博客' },
+          ]
+        },
+        {
+          week: '第12周',
+          title: 'GA4 和广告数据打通',
+          tasks: [
+            { text: '开始 Google Skillshop · GA4 认证', meta: '资源：Skillshop 免费' },
+            { text: '看 Loves Data · GA4 和 Meta 打通教程', meta: '资源：YouTube 免费' },
+            { text: '把 GA4 和 Meta Ads Manager 同一时间段数据对比，找出差异原因', meta: '实践' },
+          ]
+        },
+      ]
+    },
+    {
+      id: 'cro',
+      label: 'CRO — 从感觉优化升到数据驱动',
+      weeks: [
+        {
+          week: '第13周',
+          title: '转化研究的方法论',
+          badge: '地图',
+          tasks: [
+            { text: '读 CXL Institute · conversion research 博客系列', meta: '资源：cxl.com 免费' },
+            { text: '在客户网站安装 Hotjar 免费版，设置录屏和热力图', meta: '工具：Hotjar 免费版' },
+            { text: '观察用户在哪里流失，记录3个具体发现', meta: '实践' },
+          ]
+        },
+        {
+          week: '第14周',
+          title: '用户心理的6个核心原则',
+          tasks: [
+            { text: '开始听《影响力》audiobook（通勤时听）', meta: '资源：Audible 或免费版' },
+            { text: '读完前三章：互惠、承诺、社会证明', meta: '资源：书' },
+            { text: '在客户网站找出可以加入这些原则的具体位置', meta: '实践' },
+          ]
+        },
+        {
+          week: '第15周',
+          title: '怎么找到页面最大的流失点',
+          tasks: [
+            { text: '读 CXL Institute · heuristic analysis 博客', meta: '资源：cxl.com 免费' },
+            { text: '用 GA4 漏斗分析找出客户网站从访问到预约的最大流失步骤', meta: '实践' },
+            { text: '写出一个具体的优化假设，包含预期效果', meta: '实践' },
+          ]
+        },
+        {
+          week: '第16周',
+          title: 'A/B 测试的基本逻辑',
+          tasks: [
+            { text: '读 CXL Institute · A/B testing 统计显著性博客', meta: '资源：cxl.com 免费' },
+            { text: '在客户网站设计第一个真实测试：只改一个变量', meta: '实践' },
+            { text: '写清楚假设、成功标准、需要多少样本量', meta: '实践' },
+          ]
+        },
+        {
+          week: '第17周',
+          title: '习惯养成与用户行为设计',
+          tasks: [
+            { text: '开始听《Hooked》audiobook（通勤时听）', meta: '资源：Audible 或免费版' },
+            { text: '把 Trigger→Action→Reward→Investment 框架套用到客户预约流程', meta: '实践' },
+            { text: '找出预约流程里最弱的一个环节，提出改进方案', meta: '实践' },
+          ]
+        },
+        {
+          week: '第18周',
+          title: '整合三个方向，输出完整报告',
+          badge: '里程碑',
+          tasks: [
+            { text: '给一个按摩店客户写完整数字营销健康报告', meta: '作品集' },
+            { text: '报告包含：SEO 现状与机会、广告效果分析、转化漏斗诊断', meta: '作品集' },
+            { text: '用数据支撑每一个建议，说明业务影响', meta: '作品集' },
+          ]
+        },
+      ]
+    }
+  ]
+};
+
+let state = JSON.parse(localStorage.getItem('learning_tracker') || '{}');
+
+function save() {
+  localStorage.setItem('learning_tracker', JSON.stringify(state));
+}
+
+function getKey(phaseId, weekIdx, taskIdx) {
+  return `${phaseId}_w${weekIdx}_t${taskIdx}`;
+}
+
+function getCustomKey(phaseId, weekIdx) {
+  return `custom_${phaseId}_w${weekIdx}`;
+}
+
+function toggleTask(phaseId, weekIdx, taskIdx) {
+  const k = getKey(phaseId, weekIdx, taskIdx);
+  state[k] = !state[k];
+  save();
+  render();
+}
+
+function addCustomTask(phaseId, weekIdx, inputId) {
+  const input = document.getElementById(inputId);
+  const text = input.value.trim();
+  if (!text) return;
+  const k = getCustomKey(phaseId, weekIdx);
+  if (!state[k]) state[k] = [];
+  state[k].push({ text, done: false });
+  input.value = '';
+  save();
+  render();
+}
+
+function toggleCustomTask(phaseId, weekIdx, taskIdx) {
+  const k = getCustomKey(phaseId, weekIdx);
+  if (state[k] && state[k][taskIdx]) {
+    state[k][taskIdx].done = !state[k][taskIdx].done;
+    save();
+    render();
+  }
+}
+
+function deleteCustomTask(phaseId, weekIdx, taskIdx) {
+  const k = getCustomKey(phaseId, weekIdx);
+  if (state[k]) {
+    state[k].splice(taskIdx, 1);
+    save();
+    render();
+  }
+}
+
+function toggleWeek(cardId) {
+  const card = document.getElementById(cardId);
+  card.classList.toggle('open');
+}
+
+function resetAll() {
+  if (confirm('确认重置所有进度？')) {
+    state = {};
+    save();
+    render();
+  }
+}
+
+function countStats() {
+  let done = 0, total = 0, weeksDone = 0;
+  DATA.phases.forEach(phase => {
+    phase.weeks.forEach((week, wi) => {
+      let weekDone = true;
+      let weekTotal = week.tasks.length;
+      week.tasks.forEach((t, ti) => {
+        total++;
+        const k = getKey(phase.id, wi, ti);
+        if (state[k]) done++;
+        else weekDone = false;
+      });
+      const ck = getCustomKey(phase.id, wi);
+      if (state[ck]) {
+        state[ck].forEach((ct, ci) => {
+          total++;
+          if (ct.done) done++;
+          else weekDone = false;
+        });
+      }
+      if (weekDone && weekTotal > 0) weeksDone++;
+    });
+  });
+  return { done, total, weeksDone };
+}
+
+function render() {
+  const { done, total, weeksDone } = countStats();
+  document.getElementById('stat-done').textContent = done;
+  document.getElementById('stat-total').textContent = total;
+  document.getElementById('stat-weeks').textContent = weeksDone;
+  const pct = total > 0 ? Math.round(done / total * 100) : 0;
+  document.getElementById('progress-bar').style.width = pct + '%';
+
+  const container = document.getElementById('phases');
+  container.innerHTML = '';
+
+  DATA.phases.forEach(phase => {
+    let phaseDone = 0, phaseTotal = 0;
+    phase.weeks.forEach((week, wi) => {
+      week.tasks.forEach((t, ti) => {
+        phaseTotal++;
+        if (state[getKey(phase.id, wi, ti)]) phaseDone++;
+      });
+      const ck = getCustomKey(phase.id, wi);
+      if (state[ck]) state[ck].forEach(ct => { phaseTotal++; if (ct.done) phaseDone++; });
+    });
+
+    const section = document.createElement('div');
+    section.className = 'phase-section';
+
+    const hdr = document.createElement('div');
+    hdr.className = `phase-header ${phase.id}`;
+    hdr.innerHTML = `
+      <div class="phase-dot"></div>
+      <span class="phase-label">${phase.label}</span>
+      <span class="phase-progress">${phaseDone}/${phaseTotal}</span>
+    `;
+    section.appendChild(hdr);
+
+    phase.weeks.forEach((week, wi) => {
+      let weekDone = 0, weekTotal = week.tasks.length;
+      week.tasks.forEach((t, ti) => { if (state[getKey(phase.id, wi, ti)]) weekDone++; });
+      const ck = getCustomKey(phase.id, wi);
+      const customs = state[ck] || [];
+      weekTotal += customs.length;
+      customs.forEach(ct => { if (ct.done) weekDone++; });
+
+      const cardId = `card_${phase.id}_${wi}`;
+      const inputId = `input_${phase.id}_${wi}`;
+      const isOpen = state[`open_${cardId}`];
+      const isComplete = weekDone === weekTotal && weekTotal > 0;
+
+      const card = document.createElement('div');
+      card.className = `week-card ${phase.id}${isComplete ? ' completed' : ''}${isOpen ? ' open' : ''}`;
+      card.id = cardId;
+
+      let tasksHtml = week.tasks.map((t, ti) => {
+        const done = state[getKey(phase.id, wi, ti)];
+        return `
+          <div class="task-item${done ? ' done' : ''}" onclick="toggleTask('${phase.id}', ${wi}, ${ti})">
+            <div class="task-cb">
+              <svg width="10" height="8" viewBox="0 0 10 8" fill="none">
+                <path d="M1 4L3.5 6.5L9 1" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </div>
+            <div style="flex:1">
+              <div class="task-text">${t.text}</div>
+              ${t.meta ? `<div class="task-meta">${t.meta}</div>` : ''}
+            </div>
+          </div>`;
+      }).join('');
+
+      let customHtml = customs.map((ct, ci) => `
+        <div class="task-item${ct.done ? ' done' : ''}" onclick="toggleCustomTask('${phase.id}', ${wi}, ${ci})">
+          <div class="task-cb">
+            <svg width="10" height="8" viewBox="0 0 10 8" fill="none">
+              <path d="M1 4L3.5 6.5L9 1" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </div>
+          <div class="task-text" style="flex:1">${ct.text}</div>
+          <button class="delete-task" onclick="event.stopPropagation();deleteCustomTask('${phase.id}', ${wi}, ${ci})">✕</button>
+        </div>`).join('');
+
+      card.innerHTML = `
+        <div class="week-header" onclick="toggleWeekCard('${cardId}')">
+          <span class="week-num">${week.week}</span>
+          <span class="week-title">${week.title}${isComplete ? ' ✓' : ''}</span>
+          ${week.badge ? `<span class="week-badge">${week.badge}</span>` : ''}
+          <span class="week-progress" style="font-family:'DM Mono',monospace;font-size:0.7rem;color:var(--muted);margin-right:6px">${weekDone}/${weekTotal}</span>
+          <span class="expand-icon">▾</span>
+        </div>
+        <div class="week-body">
+          <div class="section-label">本周任务</div>
+          <div class="task-list">
+            ${tasksHtml}
+            ${customHtml}
+          </div>
+          <div class="add-task-row">
+            <input class="add-task-input" id="${inputId}" placeholder="添加自定义任务..." onkeydown="if(event.key==='Enter')addCustomTask('${phase.id}',${wi},'${inputId}')">
+            <button class="add-task-btn" onclick="addCustomTask('${phase.id}',${wi},'${inputId}')">添加</button>
+          </div>
+        </div>`;
+
+      section.appendChild(card);
+    });
+
+    container.appendChild(section);
+  });
+}
+
+function toggleWeekCard(cardId) {
+  const card = document.getElementById(cardId);
+  card.classList.toggle('open');
+  state[`open_${cardId}`] = card.classList.contains('open');
+  save();
+}
+
+render();
+</script>
+</body>
+</html>
