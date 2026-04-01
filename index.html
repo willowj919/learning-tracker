@@ -6,349 +6,128 @@
 <title>学习规划追踪器</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Mono:wght@400;500&family=Syne:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
-  :root {
-    --bg: #F7F5F0;
-    --surface: #FFFFFF;
-    --border: #E2DDD6;
-    --text: #1A1814;
-    --muted: #8A8580;
-    --seo: #0F6E56;
-    --seo-bg: #E1F5EE;
-    --seo-mid: #1D9E75;
-    --perf: #3C3489;
-    --perf-bg: #EEEDFE;
-    --perf-mid: #7F77DD;
-    --cro: #633806;
-    --cro-bg: #FAEEDA;
-    --cro-mid: #BA7517;
-    --accent: #1A1814;
-  }
-
-  * { box-sizing: border-box; margin: 0; padding: 0; }
-
-  body {
-    font-family: 'Syne', sans-serif;
-    background: var(--bg);
-    color: var(--text);
-    min-height: 100vh;
-    padding: 2rem 1rem 4rem;
-  }
-
-  .container { max-width: 780px; margin: 0 auto; }
-
-  header {
-    margin-bottom: 3rem;
-    padding-bottom: 2rem;
-    border-bottom: 1px solid var(--border);
-  }
-
-  .header-top {
-    display: flex;
-    align-items: flex-start;
-    justify-content: space-between;
-    gap: 1rem;
-    flex-wrap: wrap;
-  }
-
-  h1 {
-    font-family: 'DM Serif Display', serif;
-    font-size: clamp(2rem, 5vw, 3rem);
-    line-height: 1.1;
-    letter-spacing: -0.02em;
-  }
-
-  h1 em {
-    font-style: italic;
-    color: var(--muted);
-  }
-
-  .progress-summary {
-    display: flex;
-    gap: 1.5rem;
-    margin-top: 1.5rem;
-    flex-wrap: wrap;
-  }
-
-  .progress-stat {
-    display: flex;
-    flex-direction: column;
-    gap: 2px;
-  }
-
-  .progress-stat .num {
-    font-family: 'DM Mono', monospace;
-    font-size: 1.75rem;
-    font-weight: 500;
-    line-height: 1;
-  }
-
-  .progress-stat .label {
-    font-size: 0.7rem;
-    color: var(--muted);
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-  }
-
-  .progress-bar-wrap {
-    margin-top: 1.25rem;
-    height: 3px;
-    background: var(--border);
-    border-radius: 2px;
-    overflow: hidden;
-  }
-
-  .progress-bar-fill {
-    height: 100%;
-    background: var(--accent);
-    border-radius: 2px;
-    transition: width 0.4s ease;
-  }
-
-  .phase-section { margin-bottom: 2.5rem; }
-
-  .phase-header {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    margin-bottom: 1rem;
-    padding: 0.75rem 1rem;
-    border-radius: 8px;
-    position: sticky;
-    top: 0.5rem;
-    z-index: 10;
-    backdrop-filter: blur(8px);
-  }
-
-  .phase-header.seo { background: var(--seo-bg); }
-  .phase-header.perf { background: var(--perf-bg); }
-  .phase-header.cro { background: var(--cro-bg); }
-
-  .phase-dot {
-    width: 8px; height: 8px;
-    border-radius: 50%;
-    flex-shrink: 0;
-  }
-
-  .phase-header.seo .phase-dot { background: var(--seo-mid); }
-  .phase-header.perf .phase-dot { background: var(--perf-mid); }
-  .phase-header.cro .phase-dot { background: var(--cro-mid); }
-
-  .phase-label {
-    font-size: 0.7rem;
-    font-weight: 600;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-  }
-
-  .phase-header.seo .phase-label { color: var(--seo); }
-  .phase-header.perf .phase-label { color: var(--perf); }
-  .phase-header.cro .phase-label { color: var(--cro); }
-
-  .phase-progress {
-    margin-left: auto;
-    font-family: 'DM Mono', monospace;
-    font-size: 0.7rem;
-    color: var(--muted);
-  }
-
-  .week-card {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 10px;
-    margin-bottom: 10px;
-    overflow: hidden;
-    transition: border-color 0.2s;
-  }
-
-  .week-card:hover { border-color: #C8C4BC; }
-
-  .week-card.completed { opacity: 0.6; }
-
-  .week-header {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    padding: 0.875rem 1rem;
-    cursor: pointer;
-    user-select: none;
-  }
-
-  .week-num {
-    font-family: 'DM Mono', monospace;
-    font-size: 0.7rem;
-    color: var(--muted);
-    min-width: 40px;
-    flex-shrink: 0;
-  }
-
-  .week-title {
-    flex: 1;
-    font-size: 0.9rem;
-    font-weight: 500;
-  }
-
-  .week-badge {
-    font-size: 0.65rem;
-    padding: 2px 8px;
-    border-radius: 20px;
-    flex-shrink: 0;
-  }
-
-  .seo .week-badge { background: var(--seo-bg); color: var(--seo); }
-  .perf .week-badge { background: var(--perf-bg); color: var(--perf); }
-  .cro .week-badge { background: var(--cro-bg); color: var(--cro); }
-
-  .expand-icon {
-    font-size: 0.7rem;
-    color: var(--muted);
-    transition: transform 0.2s;
-    flex-shrink: 0;
-  }
-
-  .week-card.open .expand-icon { transform: rotate(180deg); }
-
-  .week-body {
-    display: none;
-    padding: 0 1rem 1rem;
-    border-top: 1px solid var(--border);
-  }
-
-  .week-card.open .week-body { display: block; }
-
-  .task-list { margin-top: 0.875rem; display: flex; flex-direction: column; gap: 6px; }
-
-  .task-item {
-    display: flex;
-    align-items: flex-start;
-    gap: 10px;
-    padding: 8px 10px;
-    border-radius: 6px;
-    background: var(--bg);
-    transition: background 0.15s;
-    cursor: pointer;
-  }
-
-  .task-item:hover { background: #EEEAE2; }
-
-  .task-item.done { opacity: 0.5; }
-
-  .task-item.done .task-text { text-decoration: line-through; }
-
-  .task-cb {
-    width: 16px; height: 16px;
-    border: 1.5px solid var(--border);
-    border-radius: 4px;
-    flex-shrink: 0;
-    margin-top: 1px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: all 0.15s;
-    background: white;
-  }
-
-  .task-item.done .task-cb {
-    background: var(--accent);
-    border-color: var(--accent);
-  }
-
-  .task-cb svg { display: none; }
-  .task-item.done .task-cb svg { display: block; }
-
-  .task-text { font-size: 0.82rem; line-height: 1.5; color: var(--text); flex: 1; }
-
-  .task-meta { font-size: 0.72rem; color: var(--muted); margin-top: 2px; }
-
-  .section-label {
-    font-size: 0.65rem;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-    color: var(--muted);
-    margin: 1rem 0 0.4rem;
-  }
-
-  .add-task-row {
-    display: flex;
-    gap: 8px;
-    margin-top: 0.75rem;
-  }
-
-  .add-task-input {
-    flex: 1;
-    font-family: 'Syne', sans-serif;
-    font-size: 0.82rem;
-    padding: 7px 10px;
-    border: 1px solid var(--border);
-    border-radius: 6px;
-    background: var(--bg);
-    color: var(--text);
-    outline: none;
-    transition: border-color 0.15s;
-  }
-
-  .add-task-input:focus { border-color: var(--accent); }
-  .add-task-input::placeholder { color: var(--muted); }
-
-  .add-task-btn {
-    font-family: 'Syne', sans-serif;
-    font-size: 0.75rem;
-    padding: 7px 14px;
-    background: var(--accent);
-    color: white;
-    border: none;
-    border-radius: 6px;
-    cursor: pointer;
-    transition: opacity 0.15s;
-    white-space: nowrap;
-  }
-
-  .add-task-btn:hover { opacity: 0.8; }
-
-  .delete-task {
-    font-size: 0.7rem;
-    color: var(--muted);
-    cursor: pointer;
-    padding: 2px 4px;
-    border-radius: 3px;
-    flex-shrink: 0;
-    opacity: 0;
-    transition: opacity 0.15s;
-    background: none;
-    border: none;
-  }
-
-  .task-item:hover .delete-task { opacity: 1; }
-  .delete-task:hover { color: #cc4444; }
-
-  .reset-btn {
-    font-family: 'Syne', sans-serif;
-    font-size: 0.72rem;
-    padding: 6px 12px;
-    background: none;
-    color: var(--muted);
-    border: 1px solid var(--border);
-    border-radius: 6px;
-    cursor: pointer;
-    transition: all 0.15s;
-  }
-
-  .reset-btn:hover { border-color: #cc4444; color: #cc4444; }
-
-  .core-q-card {
-    background: var(--accent);
-    color: white;
-    border-radius: 10px;
-    padding: 1.25rem 1.5rem;
-    margin-bottom: 2rem;
-  }
-
-  .core-q-card p { font-size: 0.78rem; opacity: 0.7; margin-bottom: 6px; }
-  .core-q-card h2 { font-family: 'DM Serif Display', serif; font-size: 1.25rem; line-height: 1.4; font-weight: 400; }
-
-  @media (max-width: 500px) {
-    .week-body { padding: 0 0.75rem 0.75rem; }
-    .progress-summary { gap: 1rem; }
-  }
+:root {
+  --bg: #F7F5F0; --surface: #FFFFFF; --border: #E2DDD6; --text: #1A1814; --muted: #8A8580;
+  --seo: #0F6E56; --seo-bg: #E1F5EE; --seo-mid: #1D9E75;
+  --perf: #3C3489; --perf-bg: #EEEDFE; --perf-mid: #7F77DD;
+  --cro: #633806; --cro-bg: #FAEEDA; --cro-mid: #BA7517;
+  --accent: #1A1814; --focus: #C84B2F; --focus-bg: #FDF0EC;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: 'Syne', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; padding: 2rem 1rem 6rem; }
+.container { max-width: 780px; margin: 0 auto; }
+header { margin-bottom: 2rem; padding-bottom: 2rem; border-bottom: 1px solid var(--border); }
+.header-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 1rem; flex-wrap: wrap; }
+h1 { font-family: 'DM Serif Display', serif; font-size: clamp(2rem, 5vw, 3rem); line-height: 1.1; letter-spacing: -0.02em; }
+h1 em { font-style: italic; color: var(--muted); }
+.progress-summary { display: flex; gap: 1.5rem; margin-top: 1.5rem; flex-wrap: wrap; }
+.progress-stat .num { font-family: 'DM Mono', monospace; font-size: 1.75rem; font-weight: 500; line-height: 1; display: block; }
+.progress-stat .label { font-size: 0.7rem; color: var(--muted); letter-spacing: 0.08em; text-transform: uppercase; }
+.progress-bar-wrap { margin-top: 1.25rem; height: 3px; background: var(--border); border-radius: 2px; overflow: hidden; }
+.progress-bar-fill { height: 100%; background: var(--accent); border-radius: 2px; transition: width 0.4s ease; }
+.core-q-card { background: var(--accent); color: white; border-radius: 10px; padding: 1.25rem 1.5rem; margin-bottom: 1.5rem; }
+.core-q-card p { font-size: 0.78rem; opacity: 0.7; margin-bottom: 6px; }
+.core-q-card h2 { font-family: 'DM Serif Display', serif; font-size: 1.25rem; line-height: 1.4; font-weight: 400; }
+.tab-nav { display: flex; gap: 4px; margin-bottom: 1.5rem; background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 4px; }
+.tab-btn { flex: 1; font-family: 'Syne', sans-serif; font-size: 0.75rem; font-weight: 500; padding: 8px 6px; border: none; border-radius: 7px; background: none; color: var(--muted); cursor: pointer; transition: all 0.15s; }
+.tab-btn.active { background: var(--accent); color: white; }
+.tab-btn:hover:not(.active) { background: var(--bg); color: var(--text); }
+.tab-panel { display: none; }
+.tab-panel.active { display: block; }
+.card { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 1.25rem; margin-bottom: 1rem; }
+.card h3 { font-size: 0.85rem; font-weight: 600; margin-bottom: 0.75rem; }
+.card p { font-size: 0.78rem; color: var(--muted); margin-bottom: 1rem; line-height: 1.6; }
+textarea { width: 100%; font-family: 'Syne', sans-serif; font-size: 0.85rem; line-height: 1.7; padding: 10px 12px; border: 1px solid var(--border); border-radius: 8px; background: var(--bg); color: var(--text); resize: vertical; min-height: 90px; outline: none; transition: border-color 0.15s; }
+textarea:focus { border-color: var(--accent); }
+textarea::placeholder { color: var(--muted); }
+.row { display: flex; gap: 8px; margin-top: 8px; }
+input.text-input { flex: 1; font-family: 'Syne', sans-serif; font-size: 0.85rem; padding: 9px 12px; border: 1px solid var(--border); border-radius: 8px; background: var(--surface); color: var(--text); outline: none; transition: border-color 0.15s; }
+input.text-input:focus { border-color: var(--accent); }
+input.text-input::placeholder { color: var(--muted); }
+.btn { font-family: 'Syne', sans-serif; font-size: 0.75rem; padding: 9px 16px; border: none; border-radius: 8px; cursor: pointer; transition: opacity 0.15s; white-space: nowrap; }
+.btn-primary { background: var(--accent); color: white; }
+.btn-primary:hover { opacity: 0.82; }
+.btn-outline { background: none; color: var(--text); border: 1px solid var(--border); }
+.btn-outline:hover { border-color: var(--accent); }
+.btn-sm { font-family: 'Syne', sans-serif; font-size: 0.72rem; padding: 6px 12px; background: none; color: var(--muted); border: 1px solid var(--border); border-radius: 6px; cursor: pointer; }
+.btn-sm:hover { border-color: #C8C4BC; color: var(--text); }
+.btn-danger:hover { border-color: #cc4444 !important; color: #cc4444 !important; }
+.section-label { font-size: 0.65rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); margin: 1rem 0 0.5rem; }
+.note-entry { background: var(--bg); border-radius: 8px; padding: 10px 12px; margin-bottom: 8px; position: relative; }
+.note-entry-date { font-family: 'DM Mono', monospace; font-size: 0.65rem; color: var(--muted); margin-bottom: 4px; }
+.note-entry-text { font-size: 0.82rem; line-height: 1.6; white-space: pre-wrap; }
+.x-btn { position: absolute; top: 8px; right: 8px; background: none; border: none; font-size: 0.7rem; color: var(--muted); cursor: pointer; opacity: 0; transition: opacity 0.15s; }
+.note-entry:hover .x-btn, .inbox-item:hover .x-btn { opacity: 1; }
+.x-btn:hover { color: #cc4444; }
+.inbox-item { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 10px 12px; margin-bottom: 8px; display: flex; align-items: flex-start; gap: 10px; position: relative; }
+.inbox-item.resolved { opacity: 0.5; }
+.inbox-item.resolved .inbox-text { text-decoration: line-through; }
+.cb { width: 16px; height: 16px; border: 1.5px solid var(--border); border-radius: 4px; flex-shrink: 0; margin-top: 2px; display: flex; align-items: center; justify-content: center; cursor: pointer; background: white; transition: all 0.15s; }
+.cb.checked { background: var(--accent); border-color: var(--accent); }
+.cb svg { display: none; }
+.cb.checked svg { display: block; }
+.inbox-text { flex: 1; font-size: 0.85rem; line-height: 1.5; }
+.inbox-date { font-family: 'DM Mono', monospace; font-size: 0.65rem; color: var(--muted); margin-top: 3px; }
+.empty-state { text-align: center; padding: 2rem; color: var(--muted); font-size: 0.82rem; font-style: italic; }
+.focus-banner { background: var(--focus-bg); border: 1px solid #EEC4B6; border-radius: 10px; padding: 1rem 1.25rem; margin-bottom: 1.5rem; display: flex; align-items: center; gap: 12px; }
+.focus-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--focus); flex-shrink: 0; }
+.focus-label { font-size: 0.68rem; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--focus); margin-bottom: 2px; }
+.focus-title { font-size: 0.9rem; font-weight: 500; }
+.focus-clear { margin-left: auto; font-family: 'Syne', sans-serif; font-size: 0.7rem; color: var(--muted); background: none; border: none; cursor: pointer; flex-shrink: 0; }
+.focus-clear:hover { color: #cc4444; }
+.focus-badge { font-size: 0.62rem; padding: 2px 7px; border-radius: 20px; background: var(--focus-bg); color: var(--focus); border: 1px solid #EEC4B6; flex-shrink: 0; }
+.phase-section { margin-bottom: 2.5rem; }
+.phase-header { display: flex; align-items: center; gap: 10px; margin-bottom: 1rem; padding: 0.75rem 1rem; border-radius: 8px; position: sticky; top: 0.5rem; z-index: 10; backdrop-filter: blur(8px); }
+.phase-header.seo { background: var(--seo-bg); }
+.phase-header.perf { background: var(--perf-bg); }
+.phase-header.cro { background: var(--cro-bg); }
+.phase-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+.phase-header.seo .phase-dot { background: var(--seo-mid); }
+.phase-header.perf .phase-dot { background: var(--perf-mid); }
+.phase-header.cro .phase-dot { background: var(--cro-mid); }
+.phase-lbl { font-size: 0.7rem; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; }
+.phase-header.seo .phase-lbl { color: var(--seo); }
+.phase-header.perf .phase-lbl { color: var(--perf); }
+.phase-header.cro .phase-lbl { color: var(--cro); }
+.phase-prog { margin-left: auto; font-family: 'DM Mono', monospace; font-size: 0.7rem; color: var(--muted); }
+.week-card { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; margin-bottom: 10px; overflow: hidden; transition: border-color 0.2s; }
+.week-card:hover { border-color: #C8C4BC; }
+.week-card.is-focus { border-color: var(--focus); border-width: 1.5px; }
+.week-card.completed { opacity: 0.6; }
+.week-header { display: flex; align-items: center; gap: 8px; padding: 0.875rem 1rem; cursor: pointer; user-select: none; }
+.week-num { font-family: 'DM Mono', monospace; font-size: 0.68rem; color: var(--muted); min-width: 38px; flex-shrink: 0; }
+.week-title { flex: 1; font-size: 0.88rem; font-weight: 500; }
+.week-badge { font-size: 0.62rem; padding: 2px 7px; border-radius: 20px; flex-shrink: 0; }
+.seo .week-badge { background: var(--seo-bg); color: var(--seo); }
+.perf .week-badge { background: var(--perf-bg); color: var(--perf); }
+.cro .week-badge { background: var(--cro-bg); color: var(--cro); }
+.week-prog { font-family: 'DM Mono', monospace; font-size: 0.68rem; color: var(--muted); flex-shrink: 0; }
+.expand-icon { font-size: 0.65rem; color: var(--muted); transition: transform 0.2s; flex-shrink: 0; }
+.week-card.open .expand-icon { transform: rotate(180deg); }
+.week-body { display: none; padding: 0 1rem 1rem; border-top: 1px solid var(--border); }
+.week-card.open .week-body { display: block; }
+.task-list { margin-top: 0.75rem; display: flex; flex-direction: column; gap: 5px; }
+.task-item { display: flex; align-items: flex-start; gap: 10px; padding: 8px 10px; border-radius: 6px; background: var(--bg); cursor: pointer; transition: background 0.15s; }
+.task-item:hover { background: #EEEAE2; }
+.task-item.done { opacity: 0.5; }
+.task-item.done .task-text { text-decoration: line-through; }
+.task-text { font-size: 0.82rem; line-height: 1.5; flex: 1; }
+.task-meta { font-size: 0.7rem; color: var(--muted); margin-top: 2px; }
+.del-task { font-size: 0.68rem; color: var(--muted); background: none; border: none; cursor: pointer; opacity: 0; padding: 2px 4px; border-radius: 3px; flex-shrink: 0; }
+.task-item:hover .del-task { opacity: 1; }
+.del-task:hover { color: #cc4444; }
+.add-row { display: flex; gap: 8px; margin-top: 0.75rem; }
+.add-input { flex: 1; font-family: 'Syne', sans-serif; font-size: 0.8rem; padding: 7px 10px; border: 1px solid var(--border); border-radius: 6px; background: var(--bg); color: var(--text); outline: none; }
+.add-input:focus { border-color: var(--accent); }
+.add-input::placeholder { color: var(--muted); }
+.add-btn { font-family: 'Syne', sans-serif; font-size: 0.73rem; padding: 7px 13px; background: var(--accent); color: white; border: none; border-radius: 6px; cursor: pointer; }
+.week-actions { margin-top: 0.875rem; display: flex; gap: 8px; }
+.focus-toggle { font-family: 'Syne', sans-serif; font-size: 0.72rem; padding: 5px 11px; border-radius: 6px; border: 1px solid var(--border); background: none; color: var(--muted); cursor: pointer; transition: all 0.15s; }
+.focus-toggle:hover { border-color: var(--focus); color: var(--focus); }
+.focus-toggle.active { border-color: var(--focus); color: var(--focus); background: var(--focus-bg); }
+.import-label { font-family: 'Syne', sans-serif; font-size: 0.75rem; padding: 9px 16px; background: none; color: var(--text); border: 1px solid var(--border); border-radius: 8px; cursor: pointer; display: inline-block; }
+.import-label:hover { border-color: var(--accent); }
+.import-ok { font-size: 0.75rem; color: var(--seo); margin-top: 8px; display: none; }
 </style>
 </head>
 <body>
@@ -357,25 +136,14 @@
 <header>
   <div class="header-top">
     <h1>学习<br><em>规划追踪</em></h1>
-    <button class="reset-btn" onclick="resetAll()">重置进度</button>
+    <button class="btn-sm btn-danger" onclick="resetAll()" style="margin-top:6px">重置数据</button>
   </div>
   <div class="progress-summary">
-    <div class="progress-stat">
-      <span class="num" id="stat-done">0</span>
-      <span class="label">已完成任务</span>
-    </div>
-    <div class="progress-stat">
-      <span class="num" id="stat-total">0</span>
-      <span class="label">总任务数</span>
-    </div>
-    <div class="progress-stat">
-      <span class="num" id="stat-weeks">0</span>
-      <span class="label">已完成周数</span>
-    </div>
+    <div class="progress-stat"><span class="num" id="s-done">0</span><span class="label">已完成任务</span></div>
+    <div class="progress-stat"><span class="num" id="s-total">0</span><span class="label">总任务数</span></div>
+    <div class="progress-stat"><span class="num" id="s-weeks">0</span><span class="label">已完成周数</span></div>
   </div>
-  <div class="progress-bar-wrap">
-    <div class="progress-bar-fill" id="progress-bar" style="width:0%"></div>
-  </div>
+  <div class="progress-bar-wrap"><div class="progress-bar-fill" id="prog-bar" style="width:0%"></div></div>
 </header>
 
 <div class="core-q-card">
@@ -383,406 +151,356 @@
   <h2>"这件事影响的是流量、留存、还是转化？"</h2>
 </div>
 
-<div id="phases"></div>
-
+<div class="tab-nav">
+  <button class="tab-btn active" onclick="switchTab('tracker',this)">学习追踪</button>
+  <button class="tab-btn" onclick="switchTab('today',this)">今日笔记</button>
+  <button class="tab-btn" onclick="switchTab('inbox',this)">问题收集箱</button>
+  <button class="tab-btn" onclick="switchTab('sync',this)">导入 / 导出</button>
 </div>
 
+<div class="tab-panel active" id="tab-tracker">
+  <div id="focus-wrap"></div>
+  <div id="phases"></div>
+</div>
+
+<div class="tab-panel" id="tab-today">
+  <div class="card">
+    <h3>今天学到了什么 &nbsp;<span style="font-family:'DM Mono',monospace;font-size:0.68rem;color:var(--muted);font-weight:400" id="today-date"></span></h3>
+    <textarea id="note-ta" placeholder="用一两句话记下今天搞清楚的事情，或者在工作中发现的规律……"></textarea>
+    <div class="row"><button class="btn btn-primary" onclick="saveNote()">保存笔记</button></div>
+  </div>
+  <div id="notes-list"></div>
+</div>
+
+<div class="tab-panel" id="tab-inbox">
+  <div class="card">
+    <h3>问题收集箱</h3>
+    <p>工作中碰到不懂的东西，随时扔进来。晚上图书馆的时候取一个出来深挖。</p>
+    <div class="row">
+      <input class="text-input" id="inbox-input" placeholder="今天碰到什么不懂的问题？" onkeydown="if(event.key==='Enter')addInbox()">
+      <button class="btn btn-primary" onclick="addInbox()">记下来</button>
+    </div>
+  </div>
+  <div id="inbox-list"></div>
+</div>
+
+<div class="tab-panel" id="tab-sync">
+  <div class="card">
+    <h3>导出进度</h3>
+    <p>把所有进度、笔记、问题收集箱导出为文件，可以在另一台设备上导入。</p>
+    <div class="row"><button class="btn btn-primary" onclick="exportData()">导出进度文件</button></div>
+  </div>
+  <div class="card">
+    <h3>导入进度</h3>
+    <p>选择之前导出的文件，导入后会覆盖当前设备上的所有数据。</p>
+    <div class="row">
+      <label class="import-label" for="import-file">选择文件导入</label>
+      <input type="file" id="import-file" accept=".json" onchange="importData(event)" style="display:none">
+    </div>
+    <div class="import-ok" id="import-ok">导入成功！</div>
+  </div>
+  <div class="card">
+    <h3>重置所有数据</h3>
+    <p>清除所有进度、笔记和问题记录，重新开始。</p>
+    <button class="btn-sm btn-danger" onclick="resetAll()">重置全部</button>
+  </div>
+</div>
+
+</div>
 <script>
-const DATA = {
-  phases: [
-    {
-      id: 'seo',
-      label: 'SEO — 先建地图，再填细节',
-      weeks: [
-        {
-          week: '第1周',
-          title: '搜索意图是什么',
-          badge: '地图',
-          tasks: [
-            { text: '看 Aleyda Solis "search intent" YouTube 系列视频', meta: '资源：YouTube' },
-            { text: '把两个客户网站的核心页面逐一检查：用户搜这个词想要什么？', meta: '实践' },
-            { text: '找出至少3个意图不匹配的页面，记录下来', meta: '实践' },
-          ]
-        },
-        {
-          week: '第2周',
-          title: 'GSC数据怎么读',
-          badge: '地图',
-          tasks: [
-            { text: '读 Google Search Console 官方文档的 Performance 报告部分', meta: '资源：GSC官方文档' },
-            { text: '订阅 Search Engine Roundtable，保持行业动态感知', meta: '资源：免费' },
-            { text: '找出 impressions > 100 但 CTR < 3% 的所有页面', meta: '实践' },
-            { text: '针对其中一个页面，写出改进 title/meta 的具体假设', meta: '实践' },
-          ]
-        },
-        {
-          week: '第3周',
-          title: 'Tech SEO 的优先级框架',
-          tasks: [
-            { text: '用 Screaming Frog 免费版爬客户网站', meta: '工具：Screaming Frog' },
-            { text: '只关注4类问题：crawl errors、重复内容、缺失 meta、慢速页面', meta: '实践' },
-            { text: '列出按优先级排序的修复清单', meta: '实践' },
-          ]
-        },
-        {
-          week: '第4周',
-          title: 'Local SEO 的核心逻辑',
-          tasks: [
-            { text: '读 Whitespark Local SEO Ranking Factors 报告', meta: '资源：whitespark.ca 免费' },
-            { text: '检查两个客户 GBP 完整度：类别、描述、照片、reviews回复、Q&A', meta: '实践' },
-            { text: '找出两个客户 GBP 最大的优化缺口', meta: '实践' },
-          ]
-        },
-        {
-          week: '第5周',
-          title: '关键词研究的底层逻辑',
-          tasks: [
-            { text: '看 Ahrefs Academy 关键词研究模块（免费）', meta: '资源：ahrefs.com/academy' },
-            { text: '用免费版 Ahrefs 或 Semrush 找竞争对手排名但你没有的关键词', meta: '实践' },
-            { text: '建立一个"可以赢的关键词"优先级清单', meta: '实践' },
-          ]
-        },
-        {
-          week: '第6周',
-          title: 'Core Web Vitals 实操',
-          tasks: [
-            { text: '用 PageSpeed Insights 跑两个客户网站', meta: '工具：免费' },
-            { text: '找出 LCP 和 CLS 的具体问题', meta: '实践' },
-            { text: '读 web.dev 对应修复文档，执行至少一个修复', meta: '资源：web.dev 官方' },
-          ]
-        },
-      ]
-    },
-    {
-      id: 'perf',
-      label: 'Performance Marketing — 从执行升到分析',
-      weeks: [
-        {
-          week: '第7周',
-          title: '广告漏斗的完整逻辑',
-          badge: '地图',
-          tasks: [
-            { text: '开始 Meta Blueprint 完整 Marketing 认证路径', meta: '资源：Meta Blueprint 免费' },
-            { text: '在 agency 实际账户里，把一个 campaign 漏斗从头到尾读一遍', meta: '实践' },
-            { text: '找出最大的流失环节，写下你的分析', meta: '实践' },
-          ]
-        },
-        {
-          week: '第8周',
-          title: '归因模型是什么',
-          badge: '地图',
-          tasks: [
-            { text: '完成 Meta Blueprint 归因模块', meta: '资源：Meta Blueprint' },
-            { text: '看 Loves Data YouTube 归因模型讲解视频', meta: '资源：YouTube 免费' },
-            { text: '在 Ads Manager 切换归因窗口，观察同一 campaign 数据变化', meta: '实践' },
-          ]
-        },
-        {
-          week: '第9周',
-          title: '受众策略的底层逻辑',
-          tasks: [
-            { text: '完成 Meta Blueprint 受众模块', meta: '资源：Meta Blueprint' },
-            { text: '比较 agency 账户里不同受众组的 CPM、CTR 和转化率', meta: '实践' },
-            { text: '总结表现最好的受众特征规律', meta: '实践' },
-          ]
-        },
-        {
-          week: '第10周',
-          title: '如何判断广告是否值得继续投',
-          tasks: [
-            { text: '看 Loves Data · ROAS 分析系列视频', meta: '资源：YouTube 免费' },
-            { text: '找出 agency 里一个表现差的 campaign，用 ROAS/CPA 框架分析', meta: '实践' },
-            { text: '写出应该停投还是继续优化的判断和理由', meta: '实践' },
-          ]
-        },
-        {
-          week: '第11周',
-          title: '广告创意和落地页的匹配',
-          tasks: [
-            { text: '开始 Google Skillshop · Google Ads 认证', meta: '资源：Skillshop 免费' },
-            { text: '找一个 CTR 高但转化低的广告，分析广告承诺和落地页内容的断层', meta: '实践' },
-            { text: '读 CXL Institute landing page 优化博客对应文章', meta: '资源：cxl.com 免费博客' },
-          ]
-        },
-        {
-          week: '第12周',
-          title: 'GA4 和广告数据打通',
-          tasks: [
-            { text: '开始 Google Skillshop · GA4 认证', meta: '资源：Skillshop 免费' },
-            { text: '看 Loves Data · GA4 和 Meta 打通教程', meta: '资源：YouTube 免费' },
-            { text: '把 GA4 和 Meta Ads Manager 同一时间段数据对比，找出差异原因', meta: '实践' },
-          ]
-        },
-      ]
-    },
-    {
-      id: 'cro',
-      label: 'CRO — 从感觉优化升到数据驱动',
-      weeks: [
-        {
-          week: '第13周',
-          title: '转化研究的方法论',
-          badge: '地图',
-          tasks: [
-            { text: '读 CXL Institute · conversion research 博客系列', meta: '资源：cxl.com 免费' },
-            { text: '在客户网站安装 Hotjar 免费版，设置录屏和热力图', meta: '工具：Hotjar 免费版' },
-            { text: '观察用户在哪里流失，记录3个具体发现', meta: '实践' },
-          ]
-        },
-        {
-          week: '第14周',
-          title: '用户心理的6个核心原则',
-          tasks: [
-            { text: '开始听《影响力》audiobook（通勤时听）', meta: '资源：Audible 或免费版' },
-            { text: '读完前三章：互惠、承诺、社会证明', meta: '资源：书' },
-            { text: '在客户网站找出可以加入这些原则的具体位置', meta: '实践' },
-          ]
-        },
-        {
-          week: '第15周',
-          title: '怎么找到页面最大的流失点',
-          tasks: [
-            { text: '读 CXL Institute · heuristic analysis 博客', meta: '资源：cxl.com 免费' },
-            { text: '用 GA4 漏斗分析找出客户网站从访问到预约的最大流失步骤', meta: '实践' },
-            { text: '写出一个具体的优化假设，包含预期效果', meta: '实践' },
-          ]
-        },
-        {
-          week: '第16周',
-          title: 'A/B 测试的基本逻辑',
-          tasks: [
-            { text: '读 CXL Institute · A/B testing 统计显著性博客', meta: '资源：cxl.com 免费' },
-            { text: '在客户网站设计第一个真实测试：只改一个变量', meta: '实践' },
-            { text: '写清楚假设、成功标准、需要多少样本量', meta: '实践' },
-          ]
-        },
-        {
-          week: '第17周',
-          title: '习惯养成与用户行为设计',
-          tasks: [
-            { text: '开始听《Hooked》audiobook（通勤时听）', meta: '资源：Audible 或免费版' },
-            { text: '把 Trigger→Action→Reward→Investment 框架套用到客户预约流程', meta: '实践' },
-            { text: '找出预约流程里最弱的一个环节，提出改进方案', meta: '实践' },
-          ]
-        },
-        {
-          week: '第18周',
-          title: '整合三个方向，输出完整报告',
-          badge: '里程碑',
-          tasks: [
-            { text: '给一个按摩店客户写完整数字营销健康报告', meta: '作品集' },
-            { text: '报告包含：SEO 现状与机会、广告效果分析、转化漏斗诊断', meta: '作品集' },
-            { text: '用数据支撑每一个建议，说明业务影响', meta: '作品集' },
-          ]
-        },
-      ]
-    }
-  ]
-};
+const PHASES = [
+  { id:'seo', label:'SEO — 先建地图，再填细节', weeks:[
+    { w:'第1周', t:'搜索意图是什么', badge:'地图', tasks:[
+      {text:'看 Aleyda Solis "search intent" YouTube 系列视频',meta:'资源：YouTube'},
+      {text:'把两个客户网站的核心页面逐一检查：用户搜这个词想要什么？',meta:'实践'},
+      {text:'找出至少3个意图不匹配的页面，记录下来',meta:'实践'}]},
+    { w:'第2周', t:'GSC数据怎么读', badge:'地图', tasks:[
+      {text:'读 Google Search Console 官方文档的 Performance 报告部分',meta:'资源：官方文档'},
+      {text:'订阅 Search Engine Roundtable，保持行业动态感知',meta:'资源：免费'},
+      {text:'找出 impressions > 100 但 CTR < 3% 的所有页面',meta:'实践'},
+      {text:'针对其中一个页面，写出改进 title/meta 的具体假设',meta:'实践'}]},
+    { w:'第3周', t:'Tech SEO 的优先级框架', tasks:[
+      {text:'用 Screaming Frog 免费版爬客户网站',meta:'工具：Screaming Frog'},
+      {text:'只关注4类：crawl errors、重复内容、缺失 meta、慢速页面',meta:'实践'},
+      {text:'列出按优先级排序的修复清单',meta:'实践'}]},
+    { w:'第4周', t:'Local SEO 的核心逻辑', tasks:[
+      {text:'读 Whitespark Local SEO Ranking Factors 报告',meta:'资源：whitespark.ca 免费'},
+      {text:'检查两个客户 GBP：类别、描述、照片、reviews回复、Q&A',meta:'实践'},
+      {text:'找出两个客户 GBP 最大的优化缺口',meta:'实践'}]},
+    { w:'第5周', t:'关键词研究的底层逻辑', tasks:[
+      {text:'看 Ahrefs Academy 关键词研究模块（免费）',meta:'资源：ahrefs.com/academy'},
+      {text:'用免费版 Ahrefs 或 Semrush 找竞争对手排名但你没有的关键词',meta:'实践'},
+      {text:'建立一个"可以赢的关键词"优先级清单',meta:'实践'}]},
+    { w:'第6周', t:'Core Web Vitals 实操', tasks:[
+      {text:'用 PageSpeed Insights 跑两个客户网站',meta:'工具：免费'},
+      {text:'找出 LCP 和 CLS 的具体问题',meta:'实践'},
+      {text:'读 web.dev 对应修复文档，执行至少一个修复',meta:'资源：web.dev 官方'}]}
+  ]},
+  { id:'perf', label:'Performance Marketing — 从执行升到分析', weeks:[
+    { w:'第7周', t:'广告漏斗的完整逻辑', badge:'地图', tasks:[
+      {text:'开始 Meta Blueprint 完整 Marketing 认证路径',meta:'资源：免费'},
+      {text:'在 agency 账户里，把一个 campaign 漏斗从头到尾读一遍',meta:'实践'},
+      {text:'找出最大的流失环节，写下你的分析',meta:'实践'}]},
+    { w:'第8周', t:'归因模型是什么', badge:'地图', tasks:[
+      {text:'完成 Meta Blueprint 归因模块',meta:'资源：Meta Blueprint'},
+      {text:'看 Loves Data YouTube 归因模型讲解视频',meta:'资源：YouTube 免费'},
+      {text:'在 Ads Manager 切换归因窗口，观察同一 campaign 数据变化',meta:'实践'}]},
+    { w:'第9周', t:'受众策略的底层逻辑', tasks:[
+      {text:'完成 Meta Blueprint 受众模块',meta:'资源：Meta Blueprint'},
+      {text:'比较 agency 账户里不同受众组的 CPM、CTR 和转化率',meta:'实践'},
+      {text:'总结表现最好的受众特征规律',meta:'实践'}]},
+    { w:'第10周', t:'如何判断广告是否值得继续投', tasks:[
+      {text:'看 Loves Data · ROAS 分析系列视频',meta:'资源：YouTube 免费'},
+      {text:'找出一个表现差的 campaign，用 ROAS/CPA 框架分析',meta:'实践'},
+      {text:'写出应该停投还是继续优化的判断和理由',meta:'实践'}]},
+    { w:'第11周', t:'广告创意和落地页的匹配', tasks:[
+      {text:'开始 Google Skillshop · Google Ads 认证',meta:'资源：Skillshop 免费'},
+      {text:'找一个 CTR 高但转化低的广告，分析断层在哪里',meta:'实践'},
+      {text:'读 CXL Institute landing page 优化博客',meta:'资源：cxl.com 免费'}]},
+    { w:'第12周', t:'GA4 和广告数据打通', tasks:[
+      {text:'开始 Google Skillshop · GA4 认证',meta:'资源：Skillshop 免费'},
+      {text:'看 Loves Data · GA4 和 Meta 打通教程',meta:'资源：YouTube 免费'},
+      {text:'把 GA4 和 Ads Manager 同一时间段数据对比，找出差异原因',meta:'实践'}]}
+  ]},
+  { id:'cro', label:'CRO — 从感觉优化升到数据驱动', weeks:[
+    { w:'第13周', t:'转化研究的方法论', badge:'地图', tasks:[
+      {text:'读 CXL Institute · conversion research 博客系列',meta:'资源：cxl.com 免费'},
+      {text:'在客户网站安装 Hotjar 免费版，设置录屏和热力图',meta:'工具：Hotjar 免费版'},
+      {text:'观察用户在哪里流失，记录3个具体发现',meta:'实践'}]},
+    { w:'第14周', t:'用户心理的6个核心原则', tasks:[
+      {text:'开始听《影响力》audiobook（通勤时听）',meta:'资源：Audible 或免费版'},
+      {text:'读完前三章：互惠、承诺、社会证明',meta:'资源：书'},
+      {text:'在客户网站找出可以加入这些原则的具体位置',meta:'实践'}]},
+    { w:'第15周', t:'怎么找到页面最大的流失点', tasks:[
+      {text:'读 CXL Institute · heuristic analysis 博客',meta:'资源：cxl.com 免费'},
+      {text:'用 GA4 漏斗分析找出从访问到预约的最大流失步骤',meta:'实践'},
+      {text:'写出一个具体的优化假设，包含预期效果',meta:'实践'}]},
+    { w:'第16周', t:'A/B 测试的基本逻辑', tasks:[
+      {text:'读 CXL Institute · A/B testing 统计显著性博客',meta:'资源：cxl.com 免费'},
+      {text:'在客户网站设计第一个真实测试：只改一个变量',meta:'实践'},
+      {text:'写清楚假设、成功标准、需要多少样本量',meta:'实践'}]},
+    { w:'第17周', t:'习惯养成与用户行为设计', tasks:[
+      {text:'开始听《Hooked》audiobook（通勤时听）',meta:'资源：Audible 或免费版'},
+      {text:'把 Trigger→Action→Reward→Investment 框架套用到客户预约流程',meta:'实践'},
+      {text:'找出预约流程里最弱的一个环节，提出改进方案',meta:'实践'}]},
+    { w:'第18周', t:'整合三个方向，输出完整报告', badge:'里程碑', tasks:[
+      {text:'给一个按摩店客户写完整数字营销健康报告',meta:'作品集'},
+      {text:'报告包含：SEO 现状、广告效果分析、转化漏斗诊断',meta:'作品集'},
+      {text:'用数据支撑每一个建议，说明业务影响',meta:'作品集'}]}
+  ]}
+];
 
-let state = JSON.parse(localStorage.getItem('learning_tracker') || '{}');
+let S = JSON.parse(localStorage.getItem('lt2') || '{}');
+const save = () => localStorage.setItem('lt2', JSON.stringify(S));
+const esc = s => s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+const todayStr = () => new Date().toLocaleDateString('zh-CN',{month:'long',day:'numeric',weekday:'short'});
+const checkSvg = `<svg width="10" height="8" viewBox="0 0 10 8" fill="none"><path d="M1 4L3.5 6.5L9 1" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
 
-function save() {
-  localStorage.setItem('learning_tracker', JSON.stringify(state));
+function switchTab(name, btn) {
+  document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('tab-' + name).classList.add('active');
+  btn.classList.add('active');
+  if (name === 'today') renderNotes();
+  if (name === 'inbox') renderInbox();
 }
 
-function getKey(phaseId, weekIdx, taskIdx) {
-  return `${phaseId}_w${weekIdx}_t${taskIdx}`;
+function saveNote() {
+  const text = document.getElementById('note-ta').value.trim();
+  if (!text) return;
+  if (!S.notes) S.notes = [];
+  S.notes.unshift({ date: todayStr(), text, id: Date.now() });
+  document.getElementById('note-ta').value = '';
+  save(); renderNotes();
+}
+function deleteNote(id) { S.notes = (S.notes||[]).filter(n => n.id !== id); save(); renderNotes(); }
+function renderNotes() {
+  document.getElementById('today-date').textContent = todayStr();
+  const notes = S.notes || [];
+  document.getElementById('notes-list').innerHTML = notes.length
+    ? notes.map(n => `<div class="note-entry"><div class="note-entry-date">${n.date}</div><div class="note-entry-text">${esc(n.text)}</div><button class="x-btn" onclick="deleteNote(${n.id})">✕</button></div>`).join('')
+    : '<div class="empty-state">还没有笔记，今天学完记一句话吧</div>';
 }
 
-function getCustomKey(phaseId, weekIdx) {
-  return `custom_${phaseId}_w${weekIdx}`;
-}
-
-function toggleTask(phaseId, weekIdx, taskIdx) {
-  const k = getKey(phaseId, weekIdx, taskIdx);
-  state[k] = !state[k];
-  save();
-  render();
-}
-
-function addCustomTask(phaseId, weekIdx, inputId) {
-  const input = document.getElementById(inputId);
+function addInbox() {
+  const input = document.getElementById('inbox-input');
   const text = input.value.trim();
   if (!text) return;
-  const k = getCustomKey(phaseId, weekIdx);
-  if (!state[k]) state[k] = [];
-  state[k].push({ text, done: false });
-  input.value = '';
+  if (!S.inbox) S.inbox = [];
+  S.inbox.unshift({ text, resolved: false, id: Date.now(), date: todayStr() });
+  input.value = ''; save(); renderInbox();
+}
+function toggleInbox(id) {
+  const item = (S.inbox||[]).find(i => i.id === id);
+  if (item) { item.resolved = !item.resolved; save(); renderInbox(); }
+}
+function deleteInbox(id) { S.inbox = (S.inbox||[]).filter(i => i.id !== id); save(); renderInbox(); }
+function renderInbox() {
+  const items = S.inbox || [];
+  if (!items.length) { document.getElementById('inbox-list').innerHTML = '<div class="empty-state">还没有问题，工作中碰到不懂的随时记下来</div>'; return; }
+  const render = i => `<div class="inbox-item${i.resolved?' resolved':''}">
+    <div class="cb${i.resolved?' checked':''}" onclick="toggleInbox(${i.id})">${checkSvg}</div>
+    <div style="flex:1"><div class="inbox-text">${esc(i.text)}</div><div class="inbox-date">${i.date}</div></div>
+    <button class="x-btn" style="position:relative;top:0;right:0;opacity:1" onclick="deleteInbox(${i.id})">✕</button>
+  </div>`;
+  const pending = items.filter(i => !i.resolved);
+  const done = items.filter(i => i.resolved);
+  let html = pending.map(render).join('');
+  if (done.length) html += `<div class="section-label">已搞清楚</div>` + done.map(render).join('');
+  document.getElementById('inbox-list').innerHTML = html;
+}
+
+function setFocus(pid, wi) {
+  const week = PHASES.find(p => p.id === pid)?.weeks[wi];
+  if (!week) return;
+  if (S.focus && S.focus.pid === pid && S.focus.wi === wi) S.focus = null;
+  else S.focus = { pid, wi, title: week.t };
+  save(); render();
+}
+function clearFocus() { S.focus = null; save(); render(); }
+function renderFocus() {
+  const wrap = document.getElementById('focus-wrap');
+  if (!S.focus) { wrap.innerHTML = ''; return; }
+  wrap.innerHTML = `<div class="focus-banner"><div class="focus-dot"></div><div><div class="focus-label">本周重点</div><div class="focus-title">${esc(S.focus.title)}</div></div><button class="focus-clear" onclick="clearFocus()">取消标记</button></div>`;
+}
+
+function toggleTask(pid, wi, ti) { const k=`${pid}_${wi}_${ti}`; S[k]=!S[k]; save(); render(); }
+function addCustom(pid, wi, iid) {
+  const inp = document.getElementById(iid);
+  const text = inp.value.trim();
+  if (!text) return;
+  const k = `c_${pid}_${wi}`;
+  if (!S[k]) S[k] = [];
+  S[k].push({ text, done: false });
+  inp.value = ''; save(); render();
+}
+function toggleCustom(pid, wi, ti) {
+  const k = `c_${pid}_${wi}`;
+  if (S[k]?.[ti]) { S[k][ti].done = !S[k][ti].done; save(); render(); }
+}
+function delCustom(pid, wi, ti) {
+  const k = `c_${pid}_${wi}`;
+  if (S[k]) { S[k].splice(ti,1); save(); render(); }
+}
+function toggleCard(id) {
+  const el = document.getElementById(id);
+  el.classList.toggle('open');
+  S['o_'+id] = el.classList.contains('open');
   save();
-  render();
-}
-
-function toggleCustomTask(phaseId, weekIdx, taskIdx) {
-  const k = getCustomKey(phaseId, weekIdx);
-  if (state[k] && state[k][taskIdx]) {
-    state[k][taskIdx].done = !state[k][taskIdx].done;
-    save();
-    render();
-  }
-}
-
-function deleteCustomTask(phaseId, weekIdx, taskIdx) {
-  const k = getCustomKey(phaseId, weekIdx);
-  if (state[k]) {
-    state[k].splice(taskIdx, 1);
-    save();
-    render();
-  }
-}
-
-function toggleWeek(cardId) {
-  const card = document.getElementById(cardId);
-  card.classList.toggle('open');
-}
-
-function resetAll() {
-  if (confirm('确认重置所有进度？')) {
-    state = {};
-    save();
-    render();
-  }
 }
 
 function countStats() {
-  let done = 0, total = 0, weeksDone = 0;
-  DATA.phases.forEach(phase => {
-    phase.weeks.forEach((week, wi) => {
-      let weekDone = true;
-      let weekTotal = week.tasks.length;
-      week.tasks.forEach((t, ti) => {
-        total++;
-        const k = getKey(phase.id, wi, ti);
-        if (state[k]) done++;
-        else weekDone = false;
-      });
-      const ck = getCustomKey(phase.id, wi);
-      if (state[ck]) {
-        state[ck].forEach((ct, ci) => {
-          total++;
-          if (ct.done) done++;
-          else weekDone = false;
-        });
-      }
-      if (weekDone && weekTotal > 0) weeksDone++;
-    });
-  });
-  return { done, total, weeksDone };
+  let done=0,total=0,wdone=0;
+  PHASES.forEach(p => p.weeks.forEach((w,wi) => {
+    let wd=true, wt=w.tasks.length;
+    w.tasks.forEach((t,ti) => { total++; if(S[`${p.id}_${wi}_${ti}`]) done++; else wd=false; });
+    (S[`c_${p.id}_${wi}`]||[]).forEach(ct => { total++; if(ct.done) done++; else wd=false; });
+    if(wd && wt>0) wdone++;
+  }));
+  return {done,total,wdone};
 }
 
 function render() {
-  const { done, total, weeksDone } = countStats();
-  document.getElementById('stat-done').textContent = done;
-  document.getElementById('stat-total').textContent = total;
-  document.getElementById('stat-weeks').textContent = weeksDone;
-  const pct = total > 0 ? Math.round(done / total * 100) : 0;
-  document.getElementById('progress-bar').style.width = pct + '%';
+  const {done,total,wdone} = countStats();
+  document.getElementById('s-done').textContent = done;
+  document.getElementById('s-total').textContent = total;
+  document.getElementById('s-weeks').textContent = wdone;
+  document.getElementById('prog-bar').style.width = (total>0?Math.round(done/total*100):0)+'%';
+  renderFocus();
 
   const container = document.getElementById('phases');
   container.innerHTML = '';
 
-  DATA.phases.forEach(phase => {
-    let phaseDone = 0, phaseTotal = 0;
-    phase.weeks.forEach((week, wi) => {
-      week.tasks.forEach((t, ti) => {
-        phaseTotal++;
-        if (state[getKey(phase.id, wi, ti)]) phaseDone++;
-      });
-      const ck = getCustomKey(phase.id, wi);
-      if (state[ck]) state[ck].forEach(ct => { phaseTotal++; if (ct.done) phaseDone++; });
+  PHASES.forEach(phase => {
+    let pd=0,pt=0;
+    phase.weeks.forEach((w,wi) => {
+      w.tasks.forEach((t,ti) => { pt++; if(S[`${phase.id}_${wi}_${ti}`]) pd++; });
+      (S[`c_${phase.id}_${wi}`]||[]).forEach(ct => { pt++; if(ct.done) pd++; });
     });
-
-    const section = document.createElement('div');
-    section.className = 'phase-section';
-
-    const hdr = document.createElement('div');
-    hdr.className = `phase-header ${phase.id}`;
-    hdr.innerHTML = `
-      <div class="phase-dot"></div>
-      <span class="phase-label">${phase.label}</span>
-      <span class="phase-progress">${phaseDone}/${phaseTotal}</span>
-    `;
-    section.appendChild(hdr);
+    const sec = document.createElement('div');
+    sec.className = 'phase-section';
+    sec.innerHTML = `<div class="phase-header ${phase.id}"><div class="phase-dot"></div><span class="phase-lbl">${phase.label}</span><span class="phase-prog">${pd}/${pt}</span></div>`;
 
     phase.weeks.forEach((week, wi) => {
-      let weekDone = 0, weekTotal = week.tasks.length;
-      week.tasks.forEach((t, ti) => { if (state[getKey(phase.id, wi, ti)]) weekDone++; });
-      const ck = getCustomKey(phase.id, wi);
-      const customs = state[ck] || [];
-      weekTotal += customs.length;
-      customs.forEach(ct => { if (ct.done) weekDone++; });
+      let wd=0, wt=week.tasks.length;
+      week.tasks.forEach((t,ti) => { if(S[`${phase.id}_${wi}_${ti}`]) wd++; });
+      const customs = S[`c_${phase.id}_${wi}`] || [];
+      wt += customs.length;
+      customs.forEach(ct => { if(ct.done) wd++; });
+      const cid = `wc_${phase.id}_${wi}`;
+      const iid = `wi_${phase.id}_${wi}`;
+      const isOpen = S['o_'+cid];
+      const isComplete = wd===wt && wt>0;
+      const isFocus = S.focus?.pid===phase.id && S.focus?.wi===wi;
 
-      const cardId = `card_${phase.id}_${wi}`;
-      const inputId = `input_${phase.id}_${wi}`;
-      const isOpen = state[`open_${cardId}`];
-      const isComplete = weekDone === weekTotal && weekTotal > 0;
-
-      const card = document.createElement('div');
-      card.className = `week-card ${phase.id}${isComplete ? ' completed' : ''}${isOpen ? ' open' : ''}`;
-      card.id = cardId;
-
-      let tasksHtml = week.tasks.map((t, ti) => {
-        const done = state[getKey(phase.id, wi, ti)];
-        return `
-          <div class="task-item${done ? ' done' : ''}" onclick="toggleTask('${phase.id}', ${wi}, ${ti})">
-            <div class="task-cb">
-              <svg width="10" height="8" viewBox="0 0 10 8" fill="none">
-                <path d="M1 4L3.5 6.5L9 1" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-              </svg>
-            </div>
-            <div style="flex:1">
-              <div class="task-text">${t.text}</div>
-              ${t.meta ? `<div class="task-meta">${t.meta}</div>` : ''}
-            </div>
-          </div>`;
+      const taskHtml = week.tasks.map((t,ti) => {
+        const done = S[`${phase.id}_${wi}_${ti}`];
+        return `<div class="task-item${done?' done':''}" onclick="toggleTask('${phase.id}',${wi},${ti})"><div class="cb${done?' checked':''}">${checkSvg}</div><div style="flex:1"><div class="task-text">${esc(t.text)}</div>${t.meta?`<div class="task-meta">${t.meta}</div>`:''}</div></div>`;
       }).join('');
 
-      let customHtml = customs.map((ct, ci) => `
-        <div class="task-item${ct.done ? ' done' : ''}" onclick="toggleCustomTask('${phase.id}', ${wi}, ${ci})">
-          <div class="task-cb">
-            <svg width="10" height="8" viewBox="0 0 10 8" fill="none">
-              <path d="M1 4L3.5 6.5L9 1" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-            </svg>
-          </div>
-          <div class="task-text" style="flex:1">${ct.text}</div>
-          <button class="delete-task" onclick="event.stopPropagation();deleteCustomTask('${phase.id}', ${wi}, ${ci})">✕</button>
-        </div>`).join('');
+      const customHtml = customs.map((ct,ci) => `<div class="task-item${ct.done?' done':''}" onclick="toggleCustom('${phase.id}',${wi},${ci})"><div class="cb${ct.done?' checked':''}">${checkSvg}</div><div class="task-text" style="flex:1">${esc(ct.text)}</div><button class="del-task" onclick="event.stopPropagation();delCustom('${phase.id}',${wi},${ci})">✕</button></div>`).join('');
 
+      const card = document.createElement('div');
+      card.className = `week-card ${phase.id}${isComplete?' completed':''}${isOpen?' open':''}${isFocus?' is-focus':''}`;
+      card.id = cid;
       card.innerHTML = `
-        <div class="week-header" onclick="toggleWeekCard('${cardId}')">
-          <span class="week-num">${week.week}</span>
-          <span class="week-title">${week.title}${isComplete ? ' ✓' : ''}</span>
-          ${week.badge ? `<span class="week-badge">${week.badge}</span>` : ''}
-          <span class="week-progress" style="font-family:'DM Mono',monospace;font-size:0.7rem;color:var(--muted);margin-right:6px">${weekDone}/${weekTotal}</span>
+        <div class="week-header" onclick="toggleCard('${cid}')">
+          <span class="week-num">${week.w}</span>
+          <span class="week-title">${esc(week.t)}${isComplete?' ✓':''}</span>
+          ${week.badge?`<span class="week-badge">${week.badge}</span>`:''}
+          ${isFocus?`<span class="focus-badge">本周重点</span>`:''}
+          <span class="week-prog">${wd}/${wt}</span>
           <span class="expand-icon">▾</span>
         </div>
         <div class="week-body">
           <div class="section-label">本周任务</div>
-          <div class="task-list">
-            ${tasksHtml}
-            ${customHtml}
+          <div class="task-list">${taskHtml}${customHtml}</div>
+          <div class="add-row">
+            <input class="add-input" id="${iid}" placeholder="添加自定义任务..." onkeydown="if(event.key==='Enter')addCustom('${phase.id}',${wi},'${iid}')">
+            <button class="add-btn" onclick="addCustom('${phase.id}',${wi},'${iid}')">添加</button>
           </div>
-          <div class="add-task-row">
-            <input class="add-task-input" id="${inputId}" placeholder="添加自定义任务..." onkeydown="if(event.key==='Enter')addCustomTask('${phase.id}',${wi},'${inputId}')">
-            <button class="add-task-btn" onclick="addCustomTask('${phase.id}',${wi},'${inputId}')">添加</button>
+          <div class="week-actions">
+            <button class="focus-toggle${isFocus?' active':''}" onclick="setFocus('${phase.id}',${wi})">${isFocus?'取消本周重点':'标记为本周重点'}</button>
           </div>
         </div>`;
-
-      section.appendChild(card);
+      sec.appendChild(card);
     });
-
-    container.appendChild(section);
+    container.appendChild(sec);
   });
 }
 
-function toggleWeekCard(cardId) {
-  const card = document.getElementById(cardId);
-  card.classList.toggle('open');
-  state[`open_${cardId}`] = card.classList.contains('open');
-  save();
+function exportData() {
+  const blob = new Blob([JSON.stringify(S,null,2)],{type:'application/json'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'learning_tracker_' + new Date().toISOString().slice(0,10) + '.json';
+  a.click();
+}
+function importData(e) {
+  const file = e.target.files[0];
+  if (!file) return;
+  const r = new FileReader();
+  r.onload = ev => {
+    try {
+      S = JSON.parse(ev.target.result);
+      save(); render(); renderNotes(); renderInbox();
+      const ok = document.getElementById('import-ok');
+      ok.style.display = 'block';
+      setTimeout(() => ok.style.display='none', 3000);
+    } catch { alert('文件格式有问题，请使用正确的导出文件'); }
+  };
+  r.readAsText(file);
+  e.target.value = '';
+}
+function resetAll() {
+  if (confirm('确认重置所有进度、笔记和问题记录？')) {
+    S = {}; save(); render(); renderNotes(); renderInbox();
+  }
 }
 
 render();
+renderNotes();
+renderInbox();
 </script>
 </body>
 </html>
